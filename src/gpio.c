@@ -93,12 +93,12 @@ void gpio_init(void)
 #endif
 
 	if (IS_ENABLED(CONFIG_PHY_SILENT)) {
-		HAL_GPIO_WritePin(CAN_S_GPIO_Port, CAN_S_Pin, GPIO_PIN_SET);
-		GPIO_InitStruct.Pin = CAN_S_Pin;
+		HAL_GPIO_WritePin(LEDTX_GPIO_Port, LEDTX_Pin, GPIO_PIN_SET);
+		GPIO_InitStruct.Pin = LEDTX_Pin;
 		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-		HAL_GPIO_Init(CAN_S_GPIO_Port, &GPIO_InitStruct);
+		HAL_GPIO_Init(LEDTX_GPIO_Port, &GPIO_InitStruct);
 	}
 
 #ifdef LEDRX_Pin
@@ -119,14 +119,14 @@ void gpio_init(void)
 	HAL_GPIO_Init(LEDTX_GPIO_Port, &GPIO_InitStruct);
 #endif
 
-	if (IS_ENABLED(CONFIG_PHY_STANDBY)) {
-		HAL_GPIO_WritePin(nCANSTBY_Port, nCANSTBY_Pin, GPIO_INIT_STATE(nCANSTBY_Active_High));
-		GPIO_InitStruct.Pin = nCANSTBY_Pin;
-		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-		HAL_GPIO_Init(nCANSTBY_Port, &GPIO_InitStruct);     //xceiver standby.
-	}
+	// if (IS_ENABLED(CONFIG_PHY_STANDBY)) {
+	// 	HAL_GPIO_WritePin(nCANSTBY_Port, nCANSTBY_Pin, GPIO_INIT_STATE(nCANSTBY_Active_High));
+	// 	GPIO_InitStruct.Pin = nCANSTBY_Pin;
+	// 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	// 	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	// 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	// 	HAL_GPIO_Init(nCANSTBY_Port, &GPIO_InitStruct);     //xceiver standby.
+	// }
 
 #ifdef DCDCEN_Pin
 	HAL_GPIO_WritePin(DCDCEN_Port, DCDCEN_Pin, GPIO_PIN_SET);

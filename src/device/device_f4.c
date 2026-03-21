@@ -30,18 +30,44 @@
 
 void device_can_init(can_data_t *channel, const struct board_channel_config *channel_config)
 {
-	__HAL_RCC_CAN1_CLK_ENABLE();
+    (void) channel_config;
 
-	GPIO_InitTypeDef itd_can1 = {
-		.Pin = GPIO_PIN_0 | GPIO_PIN_1,
-		.Mode = GPIO_MODE_AF_PP,
-		.Pull = GPIO_NOPULL,
-		.Speed = GPIO_SPEED_FREQ_VERY_HIGH,
-		.Alternate = GPIO_AF9_CAN1,
-	};
-	HAL_GPIO_Init(GPIOD, &itd_can1);
-
-	channel->instance = channel_config->interface;
+	if (channel->nr == 0) {
+		__HAL_RCC_CAN1_CLK_ENABLE();
+		GPIO_InitTypeDef itd_can1 = {
+			.Pin = GPIO_PIN_0 | GPIO_PIN_1,
+			.Mode = GPIO_MODE_AF_PP,
+			.Pull = GPIO_NOPULL,
+			.Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+			.Alternate = GPIO_AF9_CAN1,
+		};
+		HAL_GPIO_Init(GPIOD, &itd_can1);
+		channel->instance = CAN1;
+	} else if (channel->nr == 1) {
+		__HAL_RCC_CAN2_CLK_ENABLE();
+		GPIO_InitTypeDef itd_can2 = {
+			.Pin = GPIO_PIN_5 | GPIO_PIN_6,
+			.Mode = GPIO_MODE_AF_PP,
+			.Pull = GPIO_NOPULL,
+			.Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+			.Alternate = GPIO_AF9_CAN2,
+		};
+		HAL_GPIO_Init(GPIOB, &itd_can2);
+		channel->instance = CAN2;
+	} else if (channel->nr == 2) {
+		// For FDCAN1, assuming pins PA11, PA12
+		__HAL_RCC_CAN3_CLK_ENABLE();
+		GPIO_InitTypeDef itd_fdcan = {
+			.Pin = GPIO_PIN_11 | GPIO_PIN_12,
+			.Mode = GPIO_MODE_AF_PP,
+			.Pull = GPIO_NOPULL,
+			.Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+			.Alternate = GPIO_AF11_CAN3,
+		};
+		HAL_GPIO_Init(GPIOA, &itd_fdcan);
+		// Note: FDCAN1 is not CAN_TypeDef, but for now assign as placeholder
+		channel->instance = (CAN_TypeDef*)CAN3;
+	}
 }
 
 void device_sysclock_config(void) {

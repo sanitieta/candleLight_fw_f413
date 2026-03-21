@@ -33,9 +33,7 @@ add_compile_options(
 )
 
 #need these later, per-platform
-set(CPUFLAGS_F0 -mcpu=cortex-m0)
 set(CPUFLAGS_F4 -mcpu=cortex-m4)
-set(CPUFLAGS_G0 -mcpu=cortex-m0)
 
 add_link_options(
 	--specs=nano.specs
@@ -178,38 +176,11 @@ endfunction()
 # If this gets out of hand, an external solution may be better
 # (e.g. like libopencm3 does with a python script)
 
-populate_ldscript(CPU_FAMILY STM32F042X6
-	FLASH_START 0x08000000
-	FLASH_SIZE 32k
-	RAM_START 0x20000000
-	RAM_SIZE 6k
-	STACK_SIZE 1k
-	HEAP_SIZE 0k
-)
-
-populate_ldscript(CPU_FAMILY STM32F072XB
-	FLASH_START 0x08000000
-	FLASH_SIZE 128k
-	RAM_START 0x20000000
-	RAM_SIZE 16k
-	STACK_SIZE 2k
-	HEAP_SIZE 0k
-)
-
-populate_ldscript(CPU_FAMILY STM32F407XE
+populate_ldscript(CPU_FAMILY STM32F413xx
 	FLASH_START 0x08000000
 	FLASH_SIZE 512k
 	RAM_START 0x20000000
 	RAM_SIZE 128k
-	STACK_SIZE 2k
-	HEAP_SIZE 1k
-)
-
-populate_ldscript(CPU_FAMILY STM32G0B1xx
-	FLASH_START 0x08000000
-	FLASH_SIZE 128k
-	RAM_START 0x20000000
-	RAM_SIZE 144k
 	STACK_SIZE 2k
 	HEAP_SIZE 1k
 )
@@ -230,99 +201,42 @@ function(add_target_common TGTNAME CPU_FAMILY)
 	show_object_size(${TGTNAME}_fw)
 endfunction()
 
-function(add_f042_target TGTNAME)
-	add_target_common(${TGTNAME} STM32F042X6)
-	target_compile_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_F0})
-	target_compile_definitions(${TGTNAME}_fw PRIVATE BOARD_${TGTNAME} STM32F0 CONFIG_BXCAN)
-	target_sources(${TGTNAME}_fw PRIVATE "src/boards/legacy.c")
-	target_sources(${TGTNAME}_fw PRIVATE "src/can/bxcan.c")
-	target_sources(${TGTNAME}_fw PRIVATE "src/device/device_f0.c")
-	target_link_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_F0})
-	target_link_libraries(${TGTNAME}_fw PRIVATE STM32_HAL_STM32F042x6 STM32_USB_Device_Library_STM32F042x6)
-endfunction()
-
-function(add_f072_target TGTNAME)
-	add_target_common(${TGTNAME} STM32F072XB)
-	target_compile_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_F0})
-	target_compile_definitions(${TGTNAME}_fw PRIVATE BOARD_${TGTNAME} STM32F0 CONFIG_BXCAN)
-	target_sources(${TGTNAME}_fw PRIVATE "src/boards/legacy.c")
-	target_sources(${TGTNAME}_fw PRIVATE "src/can/bxcan.c")
-	target_sources(${TGTNAME}_fw PRIVATE "src/device/device_f0.c")
-	target_link_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_F0})
-	target_link_libraries(${TGTNAME}_fw PRIVATE STM32_HAL_STM32F072xB STM32_USB_Device_Library_STM32F072xB)
-endfunction()
-
-function(add_f407_target TGTNAME)
-	add_target_common(${TGTNAME} STM32F407XE)
+function(add_f413_target TGTNAME)
+	add_target_common(${TGTNAME} STM32F413xx)
 	target_compile_definitions(${TGTNAME}_fw PRIVATE BOARD_${TGTNAME} STM32F4 CONFIG_BXCAN)
 	target_compile_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_F4})
 	target_sources(${TGTNAME}_fw PRIVATE "src/boards/legacy.c")
 	target_sources(${TGTNAME}_fw PRIVATE "src/can/bxcan.c")
 	target_sources(${TGTNAME}_fw PRIVATE "src/device/device_f4.c")
 	target_link_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_F4})
-	target_link_libraries(${TGTNAME}_fw PRIVATE STM32_HAL_STM32F407xE STM32_USB_Device_Library_STM32F407xE)
-endfunction()
-
-function(add_g0b1_target TGTNAME)
-	add_target_common(${TGTNAME} STM32G0B1xx)
-	target_compile_definitions(${TGTNAME}_fw PRIVATE BOARD_${TGTNAME} STM32G0 CONFIG_M_CAN)
-	target_compile_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_G0})
-	target_sources(${TGTNAME}_fw PRIVATE "src/device/device_g0.c")
-	target_link_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_G0})
-	target_link_libraries(${TGTNAME}_fw PRIVATE STM32_HAL_STM32G0B1xx STM32_USB_Device_Library_STM32G0B1xx)
+	target_link_libraries(${TGTNAME}_fw PRIVATE STM32_HAL_STM32F413xx STM32_USB_Device_Library_STM32F413xx)
 endfunction()
 
 ########## generate list of targets.
 # the "_fw" part is appended automatically
-set(TGTF042_LIST
-	"canable"
-	"canalyze"
-	"cannette"
-	"cantact"
-	"toucan"
-	"usb2can"
-)
-set(TGTF072_LIST
-	"CANable_MKS"
-	"CONVERTDEVICE_xCAN"
-	"DSD_TECH_SH_C30A"
-	"FYSETC_UCAN"
-	"can_module_com_classic"
-	"candleLight"
-)
-set(TGTF407_LIST
-	"STM32F4_DevBoard"
-)
-set(TGTG0B1_LIST
-	"CONVERTDEVICE_xCANFD"
-	"budgetcan"
+set(TGTF413_LIST
+	"usb2can3"
 )
 
-foreach (TGTNAME IN LISTS TGTF042_LIST)
+# If the user specified -DBOARD=<name>, prefer that: only enable the matching target(s)
+if(DEFINED BOARD)
+	message(STATUS "BOARD variable set: ${BOARD} - will build only matching target(s)")
+	# Normalize: try exact match and lowercase match
+	foreach (TGTNAME IN LISTS TGTF413_LIST)
+		# turn off by default
+		set(BUILD_${TGTNAME} OFF CACHE BOOL "Build firmware for \"${TGTNAME}\" (auto-set by BOARD)" FORCE)
+		string(TOLOWER "${TGTNAME}" TGTNAME_LOWER)
+		string(TOLOWER "${BOARD}" BOARD_LOWER)
+		if("${TGTNAME}" STREQUAL "${BOARD}" OR "${TGTNAME_LOWER}" STREQUAL "${BOARD_LOWER}")
+			set(BUILD_${TGTNAME} ON CACHE BOOL "Build firmware for \"${TGTNAME}\" (auto-set by BOARD)" FORCE)
+		endif()
+	endforeach()
+endif()
+
+foreach (TGTNAME IN LISTS TGTF413_LIST)
 	option(BUILD_${TGTNAME} "Build firmware for \"${TGTNAME}\" (default=yes)" ON)
 	if (BUILD_${TGTNAME})
-		add_f042_target(${TGTNAME})
-	endif()
-endforeach()
-
-foreach (TGTNAME IN LISTS TGTF072_LIST)
-	option(BUILD_${TGTNAME} "Build firmware for \"${TGTNAME}\" (default=yes)" ON)
-	if (BUILD_${TGTNAME})
-		add_f072_target(${TGTNAME})
-	endif()
-endforeach()
-
-foreach (TGTNAME IN LISTS TGTF407_LIST)
-	option(BUILD_${TGTNAME} "Build firmware for \"${TGTNAME}\" (default=yes)" ON)
-	if (BUILD_${TGTNAME})
-		add_f407_target(${TGTNAME})
-	endif()
-endforeach()
-
-foreach (TGTNAME IN LISTS TGTG0B1_LIST)
-	option(BUILD_${TGTNAME} "Build firmware for \"${TGTNAME}\" (default=yes)" OFF)
-	if (BUILD_${TGTNAME})
-		add_g0b1_target(${TGTNAME})
+		add_f413_target(${TGTNAME})
 	endif()
 endforeach()
 

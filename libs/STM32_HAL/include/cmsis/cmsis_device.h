@@ -10,6 +10,10 @@
 #include <cmsis/device/stm32f407xx.h>
 #endif
 
+#ifdef STM32F413xx
+#include <cmsis/device/stm32f413xx.h>
+#endif
+
 #ifdef STM32G0B1xx
 #include <cmsis/device/stm32g0b1xx.h>
 #endif
