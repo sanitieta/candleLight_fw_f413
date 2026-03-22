@@ -51,14 +51,11 @@ THE SOFTWARE.
 #define DFU_INTERFACE_STRING_FS	 "usb2can3 firmware upgrade interface"
 
 #define TIM2_CLOCK_SPEED		 48000000
-/* 1. 把 CAN 改为 CAN1 */
 #define CAN_INTERFACE			 CAN1
 #define CAN_INTERFACE2			 CAN2
 #define CAN_INTERFACE3			 CAN3
 
 /* 2. 补充收发器控制的占位宏（骗过 legacy.c 编译）*/
-/* 如果你的板子真有待机(Standby)引脚或终端电阻切换引脚，填真实的；
-   如果没有，就像下面这样随便写一个不用的引脚(比如 PA0)占位即可 */
 #define nCANSTBY_Port			 GPIOA
 #define nCANSTBY_Pin			 GPIO_PIN_0
 #define nCANSTBY_Active_High	 0

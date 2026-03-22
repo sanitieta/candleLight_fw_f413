@@ -70,6 +70,12 @@ const struct board_config config = {
 	.channel[0] = {
 		.interface = CAN_INTERFACE,
 	},
+	.channel[1] = {
+		.interface = CAN_INTERFACE2,
+	},
+	.channel[2] = {
+		.interface = CAN_INTERFACE3,
+	},
 	SET_PHY_POWER_FN(legacy_phy_power_set)
 	SET_TERMINATION_FN(legacy_termination_set)
 };
