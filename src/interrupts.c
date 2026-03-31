@@ -64,7 +64,7 @@ extern uint32_t __StackTop;
 
 #if defined(STM32F4)
 __attribute__((used, section(".vectors")))
-const pFunc InterruptVectorTable[84] = {
+const pFunc InterruptVectorTable[85] = {
 	(pFunc)(&__StackTop), // initial stack pointer
 	Reset_Handler,        // reset handler
 	NMI_Handler,          // -14: NMI
@@ -149,7 +149,8 @@ const pFunc InterruptVectorTable[84] = {
 	0,                    // int 63: CAN2 RX0
 	0,                    // int 64: CAN2 RX1
 	0,                    // int 65: CAN2 SCE
-	USB_Handler,          // int 66: USB OTG FS
+	0,                    // int 66: OTG_FS_WKUP
+	USB_Handler,          // int 67: USB OTG FS (OTG_FS_IRQn = 67)
 	// don't need to define any interrupts after this one
 };
 #endif

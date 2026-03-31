@@ -66,7 +66,7 @@ THE SOFTWARE.
 #define TERM_GPIO_Port			 GPIOA
 #define TERM_Pin				 GPIO_PIN_0
 #define TERM_Active_High		 0
-#define CAN_CLOCK_SPEED			 48000000
+#define CAN_CLOCK_SPEED			 48000000  /* APB1 clock = 48 MHz */
 
 #define NUM_CAN_CHANNEL			 3
 #define CONFIG_CAN_FILTER		 1

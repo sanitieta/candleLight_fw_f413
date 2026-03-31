@@ -44,6 +44,8 @@ void device_can_init(can_data_t *channel, const struct board_channel_config *cha
 		HAL_GPIO_Init(GPIOD, &itd_can1);
 		channel->instance = CAN1;
 	} else if (channel->nr == 1) {
+		/* CAN2 shares filter banks with CAN1; CAN1 clock must also be enabled */
+		__HAL_RCC_CAN1_CLK_ENABLE();
 		__HAL_RCC_CAN2_CLK_ENABLE();
 		GPIO_InitTypeDef itd_can2 = {
 			.Pin = GPIO_PIN_5 | GPIO_PIN_6,
@@ -55,7 +57,7 @@ void device_can_init(can_data_t *channel, const struct board_channel_config *cha
 		HAL_GPIO_Init(GPIOB, &itd_can2);
 		channel->instance = CAN2;
 	} else if (channel->nr == 2) {
-		// For FDCAN1, assuming pins PA11, PA12
+		/* CAN3 on STM32F413 is an independent BXCAN controller on PA11/PA12 */
 		__HAL_RCC_CAN3_CLK_ENABLE();
 		GPIO_InitTypeDef itd_fdcan = {
 			.Pin = GPIO_PIN_11 | GPIO_PIN_12,
@@ -65,8 +67,7 @@ void device_can_init(can_data_t *channel, const struct board_channel_config *cha
 			.Alternate = GPIO_AF11_CAN3,
 		};
 		HAL_GPIO_Init(GPIOA, &itd_fdcan);
-		// Note: FDCAN1 is not CAN_TypeDef, but for now assign as placeholder
-		channel->instance = (CAN_TypeDef*)CAN3;
+		channel->instance = CAN3;
 	}
 }
 
@@ -86,10 +87,10 @@ void device_sysclock_config(void) {
 		.HSEState = RCC_HSE_ON,
 		.PLL.PLLState = RCC_PLL_ON,
 		.PLL.PLLSource = RCC_PLLSOURCE_HSE,
-		.PLL.PLLM = 4,
-		.PLL.PLLN = 168,
+		.PLL.PLLM = 8,
+		.PLL.PLLN = 96,
 		.PLL.PLLP = RCC_PLLP_DIV2,
-		.PLL.PLLQ = 7,
+		.PLL.PLLQ = 4,
 	};
 	HAL_RCC_OscConfig(&RCC_OscInitStruct);
 
@@ -98,8 +99,8 @@ void device_sysclock_config(void) {
 					 RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2,
 		.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK,
 		.AHBCLKDivider = RCC_SYSCLK_DIV1,
-		.APB1CLKDivider = RCC_HCLK_DIV4,
-		.APB2CLKDivider = RCC_HCLK_DIV2,
+		.APB1CLKDivider = RCC_HCLK_DIV2,
+		.APB2CLKDivider = RCC_HCLK_DIV1,
 	};
 	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
 

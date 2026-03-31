@@ -88,6 +88,13 @@ static void rcc_reset(CAN_TypeDef *instance)
 		__HAL_RCC_CAN2_RELEASE_RESET();
 	}
 #endif
+
+#ifdef CAN3
+	if (instance == CAN3) {
+		__HAL_RCC_CAN3_FORCE_RESET();
+		__HAL_RCC_CAN3_RELEASE_RESET();
+	}
+#endif
 }
 
 void can_init(can_data_t *channel, const struct board_channel_config *channel_config)
